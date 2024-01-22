@@ -2,7 +2,6 @@ import re
 import pyperclip
 import pyautogui # pywin32
 
-from time import sleep # For tests
 from win32gui import GetWindowText, GetForegroundWindow
 
 window = GetWindowText(GetForegroundWindow())
