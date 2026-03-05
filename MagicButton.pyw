@@ -52,27 +52,26 @@ def compilePrinterInfo(printerInfo):
     pyperclip.copy(f"Enhet: {locationInfo[0]}\nAdresse: {locationInfo[1]}\nEtg./Rom: {tmp[:-1].capitalize()}\nLøpenummer: {lopenummer}\nModell: {dump[dump.index('Type/Model')+1]}")
     toast("Compiled printer info.")
 
+
 # Make text lowercase and capitalize after every period
 def capitalizeString(text):
     string = re.sub(r'\. *([a-z])', lambda match: '. ' + match.group(1).upper(), text.lower())
-    pyperclip.copy(string)
+    pyperclip.copy(string.capitalize())
     toast("De-Narinified text.")
 
-clip = pyperclip.paste()
+
+clip = pyperclip.paste().strip().lstrip()
 
 if clip in shortcuts.keys():
     pyperclip.copy (shortcuts[clip])
     toast("Copied text")
-    exit()
 
-if "papercut" in window.lower():
+elif "papercut" in window.lower():
     compilePrinterInfo(clip)
-    exit()
 
-if len(clip) == 12:
+elif len(clip) == 12:
     convertMac(clip)
-    exit()
 
-if len(clip) != 12 and clip.isupper(): # Maybe add a minimum requirement for length?
+elif len(clip) != 12 and clip.isupper(): # Maybe add a minimum requirement for length?
     capitalizeString(clip)
-    exit()
+
