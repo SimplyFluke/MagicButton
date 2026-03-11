@@ -2,6 +2,7 @@ import re
 import sqlite3
 import pyperclip
 
+from time import sleep # For tests
 from windows_toasts import Toast, WindowsToaster
 from win32gui import GetWindowText, GetForegroundWindow
 
@@ -12,7 +13,7 @@ intune_url = r'https://intune.microsoft.com/?l=en.en-gb#view/Microsoft_Intune_De
 
 shortcuts = {}
 
-toastShortcuts = {} # Aliases for toast notifications when using shortcuts
+toastShortcuts = {}
 
 # Display toast notification
 def toast(message):
@@ -62,7 +63,7 @@ def capitalizeString(text):
     pyperclip.copy(string.capitalize())
     toast("De-Narinified text.")
 
-# Convert old ID to new
+
 def convertIDfromAD(deviceID):
     try:
         with sqlite3.connect(db) as connection:
@@ -76,17 +77,17 @@ def convertIDfromAD(deviceID):
             newToast = Toast()
             newToast.duration
             newToast.text_fields = ["Converted to new Device ID.\nClick here to open in Intune"]
-            newToast.launch_action = f"{intune_url}/{convert[0][1]}" # Add clickable link to Intune device
+            newToast.launch_action = f"{intune_url}/{convert[0][1]}"
 
             toaster.show_toast(newToast)            
             return
 
     except Exception as e:
         print (e)
-        toast ("Encountered error. Aborting.")
+        toast ("Encountered error. Aborting.\nDevice might not exist yet.")
         return
 
-# Get general info about computer
+
 def getComputerInfo(deviceID):
     try:
         with sqlite3.connect(db) as connection:
@@ -96,19 +97,18 @@ def getComputerInfo(deviceID):
             pyperclip.copy (f"Løpenummer: {deviceID}\nEnhet: {info[0][2]}\nModell: {info[0][0]}\nInnrullert: {info[0][1]}\nAktiv: {info[0][3]}")
 
             print(f"{intune_url}/{info[0][4]}")
-            
             # Custom toast for computer lookup
             toaster = WindowsToaster('MagicButton')
             newToast = Toast()
             newToast.duration
             newToast.text_fields = ["Grabbed computer info.\nClick here to open in Intune"]
-            newToast.launch_action = f"{intune_url}/{info[0][4]}" # Add clickable link to Intune device
+            newToast.launch_action = f"{intune_url}/{info[0][4]}"
 
             toaster.show_toast(newToast)   
             return
 
     except:
-        toast("Encountered error. Aborting.")
+        toast("Encountered error. Aborting.\nDevice might not exist yet.")
         return
     
 
@@ -119,7 +119,7 @@ if clip in shortcuts.keys():
     try:
         toast(f"Copypasta - {toastShortcuts[clip]}")
     except:
-        toast("Copied text from shortcut.")
+        toast("Copypasta derp. Could not find shortcut info.")
 
 elif "papercut" in window.lower():
     compilePrinterInfo(clip)
@@ -127,7 +127,7 @@ elif "papercut" in window.lower():
 elif "tka" in clip.lower() and len(clip) == 10:
     convertIDfromAD(clip)
 
-elif "tk5" in clip.lower() and len(clip) < 15 or "tk8" in clip.lower() and len(clip) < 15 or "tk1" in clip.lower() and len(clip) < 15:
+elif clip.lower().startswith("tk") and len(clip) < 15:
     getComputerInfo(clip)
 
 elif len(clip) == 12:
@@ -139,5 +139,3 @@ elif len(clip) != 12 and clip.isupper(): # Maybe add a minimum requirement for l
 else:
     toast(f'Could not find function "{clip}"')
     
-
-
