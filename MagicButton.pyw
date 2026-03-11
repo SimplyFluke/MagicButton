@@ -7,7 +7,7 @@ from win32gui import GetWindowText, GetForegroundWindow
 
 window = GetWindowText(GetForegroundWindow())
 
-db = 'REDACTED'
+db = r'C:\ProgramData\TK\Klientoversikt\Computers.SQLite'
 intune_url = r'https://intune.microsoft.com/?l=en.en-gb#view/Microsoft_Intune_Devices/DeviceSettingsMenuBlade/~/overview/mdmDeviceId'
 
 shortcuts = {}
@@ -139,3 +139,4 @@ elif len(clip) != 12 and clip.isupper(): # Maybe add a minimum requirement for l
 else:
     toast(f'Could not find function "{clip}"')
     
+
