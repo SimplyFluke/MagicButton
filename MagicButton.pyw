@@ -1,15 +1,18 @@
 import re
+import sqlite3
 import pyperclip
-import pyautogui # pywin32
 
-from time import sleep # For tests
 from windows_toasts import Toast, WindowsToaster
 from win32gui import GetWindowText, GetForegroundWindow
 
 window = GetWindowText(GetForegroundWindow())
 
-shortcuts = {
-    }
+db = 'REDACTED'
+intune_url = r'https://intune.microsoft.com/?l=en.en-gb#view/Microsoft_Intune_Devices/DeviceSettingsMenuBlade/~/overview/mdmDeviceId'
+
+shortcuts = {}
+
+toastShortcuts = {} # Aliases for toast notifications when using shortcuts
 
 # Display toast notification
 def toast(message):
@@ -60,14 +63,72 @@ def capitalizeString(text):
     toast("De-Narinified text.")
 
 
+def convertIDfromAD(deviceID):
+    try:
+        with sqlite3.connect(db) as connection:
+            cursor = connection.cursor()
+            convert = cursor.execute(f"SELECT Computername_Intune, IntuneDeviceID FROM Computers WHERE Computername_AD = '{deviceID}'")
+            convert = convert.fetchall()
+            pyperclip.copy(convert[0][0])
+            
+            # Custom toast for computer lookup
+            toaster = WindowsToaster('MagicButton')
+            newToast = Toast()
+            newToast.duration
+            newToast.text_fields = ["Converted to new Device ID.\nClick here to open in Intune"]
+            newToast.launch_action = f"{intune_url}/{convert[0][1]}"
+
+            toaster.show_toast(newToast)            
+            return
+
+    except Exception as e:
+        print (e)
+        toast ("Encountered error. Aborting.")
+        return
+
+
+def getComputerInfo(deviceID):
+    try:
+        with sqlite3.connect(db) as connection:
+            cursor = connection.cursor()
+            info = cursor.execute(f"SELECT Model, Enrollment_date, Department, Aktiv, IntuneDeviceID FROM Computers WHERE Computername_Intune = '{deviceID}'")
+            info = info.fetchall()
+            pyperclip.copy (f"Løpenummer: {deviceID}\nEnhet: {info[0][2]}\nModell: {info[0][0]}\nInnrullert: {info[0][1]}\nAktiv: {info[0][3]}")
+
+            print(f"{intune_url}/{info[0][4]}")
+            
+            # Custom toast for computer lookup
+            toaster = WindowsToaster('MagicButton')
+            newToast = Toast()
+            newToast.duration
+            newToast.text_fields = ["Grabbed computer info.\nClick here to open in Intune"]
+            newToast.launch_action = f"{intune_url}/{info[0][4]}"
+
+            toaster.show_toast(newToast)   
+            return
+
+    except:
+        toast("Encountered error. Aborting.")
+        return
+    
+
 clip = pyperclip.paste().strip().lstrip()
 
 if clip in shortcuts.keys():
     pyperclip.copy (shortcuts[clip])
-    toast("Copied text")
+    try:
+        toast(f"Copypasta - {toastShortcuts[clip]}")
+    except:
+        toast("Copied text from shortcut.")
 
 elif "papercut" in window.lower():
     compilePrinterInfo(clip)
+
+elif "tka" in clip.lower() and len(clip) == 10:
+    convertIDfromAD(clip)
+
+elif "tk5" in clip.lower() and len(clip) < 15 or "tk8" in clip.lower() and len(clip) < 15 or "tk1" in clip.lower() and len(clip) < 15:
+    getComputerInfo(clip)
 
 elif len(clip) == 12:
     convertMac(clip)
@@ -75,3 +136,6 @@ elif len(clip) == 12:
 elif len(clip) != 12 and clip.isupper(): # Maybe add a minimum requirement for length?
     capitalizeString(clip)
 
+else:
+    toast(f'Could not find function "{clip}"')
+    
