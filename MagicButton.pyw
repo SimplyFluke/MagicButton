@@ -62,7 +62,7 @@ def capitalizeString(text):
     pyperclip.copy(string.capitalize())
     toast("De-Narinified text.")
 
-
+# Convert old ID to new
 def convertIDfromAD(deviceID):
     try:
         with sqlite3.connect(db) as connection:
@@ -76,7 +76,7 @@ def convertIDfromAD(deviceID):
             newToast = Toast()
             newToast.duration
             newToast.text_fields = ["Converted to new Device ID.\nClick here to open in Intune"]
-            newToast.launch_action = f"{intune_url}/{convert[0][1]}"
+            newToast.launch_action = f"{intune_url}/{convert[0][1]}" # Add clickable link to Intune device
 
             toaster.show_toast(newToast)            
             return
@@ -86,7 +86,7 @@ def convertIDfromAD(deviceID):
         toast ("Encountered error. Aborting.")
         return
 
-
+# Get general info about computer
 def getComputerInfo(deviceID):
     try:
         with sqlite3.connect(db) as connection:
@@ -102,7 +102,7 @@ def getComputerInfo(deviceID):
             newToast = Toast()
             newToast.duration
             newToast.text_fields = ["Grabbed computer info.\nClick here to open in Intune"]
-            newToast.launch_action = f"{intune_url}/{info[0][4]}"
+            newToast.launch_action = f"{intune_url}/{info[0][4]}" # Add clickable link to Intune device
 
             toaster.show_toast(newToast)   
             return
@@ -139,4 +139,5 @@ elif len(clip) != 12 and clip.isupper(): # Maybe add a minimum requirement for l
 else:
     toast(f'Could not find function "{clip}"')
     
+
 
