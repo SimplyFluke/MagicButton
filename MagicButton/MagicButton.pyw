@@ -71,6 +71,7 @@ if "tka" in clip.lower() and len(clip) == 10:
 
 if clip.lower().startswith("tk") and len(clip) < 15 and not clip.lower().startswith("tka"):
     options.append(("Get computer info", lambda: mb.getComputerInfo(clip)))
+    options.append(("Get model", lambda: mb.getComputerModel(clip)))
 
 if macPattern.match(clip):
     options.append(("Convert MAC", lambda: mb.convertMac(clip)))
@@ -80,6 +81,7 @@ if len(clip) != 12 and clip.isupper():
 
 if "google sheets" in window.lower():
     options.append(("Format sheet (ADRL)", lambda: mb.formatSheetADRL()))
+
 
 
 if not options:
@@ -92,5 +94,6 @@ else:
     chosen = ask_user_to_choose_menu(options)
     if chosen:
         chosen()
+
 
 
