@@ -125,7 +125,26 @@ def getComputerInfo(deviceID):
     except:
         toast("Encountered error. Aborting.\nDevice might not exist yet.")
         return
-    
+
+
+def getComputerModel(deviceID):
+    try:
+        with sqlite3.connect(db) as connection:
+            cursor = connection.cursor()
+            info = cursor.execute(f"SELECT Model FROM Computers WHERE Computername_Intune = '{deviceID}'")
+            info = info.fetchall()
+            pyperclip.copy(info[0][0])
+
+            toaster = WindowsToaster('MagicButton')
+            newToast = Toast()
+            newToast.duration
+            newToast.text_fields = ["Copied model name"]
+
+            toaster.show_toast(newToast)
+    except:
+        toast("Encountered error. Aborting.\nDevice might not exist yet.")
+        return
+
 
 def formatSheetADRL():
     # Move to leftmost cell
