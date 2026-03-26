@@ -55,11 +55,11 @@ if clip in mb.shortcuts.keys(): # Run shortcuts outside of other functions? Smas
     pyperclip.copy (mb.shortcuts[clip])
     try:
         mb.toast(f"Copypasta - {mb.toastShortcuts[clip]}")
-        exit()
     
     except:
         mb.toast("Copied shortcut.")
-        exit()
+   
+    exit()
 
 
 if "tkp" in clip.lower() and len(clip) > 10:
@@ -80,6 +80,7 @@ if len(clip) != 12 and clip.isupper():
 
 if "google sheets" in window.lower():
     options.append(("Format sheet (ADRL)", lambda: mb.formatSheetADRL()))
+
 
 if not options:
     mb.toast(f'Could not find function "{clip}"')
