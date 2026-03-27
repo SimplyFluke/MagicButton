@@ -1,11 +1,23 @@
 import re
+import importlib
 import pyperclip
 import tkinter as tk # New import in v2.0
 import MBfunctions as mb
 
 from time import sleep # For tests
-from Shortcuts import shortcuts, toastShortcuts
 from win32gui import GetWindowText, GetForegroundWindow
+
+try: 
+    from Shortcuts import shortcuts, toastShortcuts
+
+except ModuleNotFoundError: # Create Shortcuts.py with necessary dicts if file is missing
+    with open ("Shortcuts.py", "w") as f:
+        f.write("shortcuts = {}\ntoastShortcuts = {}")
+
+    import Shortcuts
+    importlib.reload(Shortcuts)
+    shortcuts = Shortcuts.shortcuts
+    toastShortcuts = Shortcuts.toastShortcuts
 
 __version__ = "2.0.0"
 
