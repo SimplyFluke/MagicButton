@@ -1,24 +1,24 @@
 import re
-
 import pyperclip
-import tkinter as tk
+import tkinter as tk # New import in v2.0
 import MBfunctions as mb
 
 from time import sleep # For tests
-import tkinter as tk # New import in v2.0
+from Shortcuts import shortcuts, toastShortcuts
 from win32gui import GetWindowText, GetForegroundWindow
+
+__version__ = "2.0.0"
 
 window = GetWindowText(GetForegroundWindow())
 options = []
 macPattern = re.compile(r"^[0-9a-fA-F]{12}$")
 clip = pyperclip.paste().strip().lstrip()
 
-
 def ask_user_to_choose_menu(options):
     selected = {"func": None}
 
     root = tk.Tk()
-    root.withdraw()  # hide main window
+    root.withdraw()
 
     menu = tk.Menu(root, tearoff=0)
 
@@ -33,7 +33,6 @@ def ask_user_to_choose_menu(options):
         menu.add_separator()
     menu.add_command(label="Cancel", command=root.quit)
 
-    # Show near mouse pointer
     x = root.winfo_pointerx()
     y = root.winfo_pointery()
 
@@ -51,14 +50,13 @@ def choose_and_close(root, selected, func):
     root.destroy()
 
 
-if clip in mb.shortcuts.keys(): # Run shortcuts outside of other functions? Smash through, no fucks?
-    pyperclip.copy (mb.shortcuts[clip])
+if clip in shortcuts.keys(): # Run shortcuts outside of other functions? Smash through, no fucks?
+    pyperclip.copy (shortcuts[clip])
     try:
-        mb.toast(f"Copypasta - {mb.toastShortcuts[clip]}")
+        mb.toast(f"Copypasta - {toastShortcuts[clip]}")
     
     except:
         mb.toast("Copied shortcut.")
-   
     exit()
 
 
@@ -71,7 +69,7 @@ if "tka" in clip.lower() and len(clip) == 10:
 
 if clip.lower().startswith("tk") and len(clip) < 15 and not clip.lower().startswith("tka"):
     options.append(("Get computer info", lambda: mb.getComputerInfo(clip)))
-    options.append(("Get model", lambda: mb.getComputerModel(clip)))
+    options.append(("Get model name only", lambda: mb.getComputerModel(clip)))
 
 if macPattern.match(clip):
     options.append(("Convert MAC", lambda: mb.convertMac(clip)))
@@ -94,6 +92,3 @@ else:
     chosen = ask_user_to_choose_menu(options)
     if chosen:
         chosen()
-
-
-
