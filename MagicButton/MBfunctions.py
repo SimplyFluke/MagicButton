@@ -9,17 +9,12 @@ from windows_toasts import Toast, WindowsToaster
 db = r'C:\ProgramData\TK\Klientoversikt\Computers.SQLite'
 intune_url = r'https://intune.microsoft.com/?l=en.en-gb#view/Microsoft_Intune_Devices/DeviceSettingsMenuBlade/~/overview/mdmDeviceId'
 
-shortcuts = {}
-
-toastShortcuts = {}
-
 # Display toast notification
 def toast(message):
     toaster = WindowsToaster("Magic Button")
     newToast = Toast()
     newToast.text_fields = [message]
     toaster.show_toast(newToast)
-    
 
 # Format MAC-address from Intune's ugly string
 def convertMac(macAddress):
@@ -81,6 +76,25 @@ def convertIDfromAD(deviceID):
         return
 
 
+def getComputerModel(deviceID):
+    try:
+        with sqlite3.connect(db) as connection:
+            cursor = connection.cursor()
+            info = cursor.execute(f"SELECT Model FROM Computers WHERE Computername_Intune = '{deviceID}'")
+            info = info.fetchall()
+            pyperclip.copy(info[0][0])
+
+            toaster = WindowsToaster('MagicButton')
+            newToast = Toast()
+            newToast.duration
+            newToast.text_fields = ["Copied model name"]
+
+            toaster.show_toast(newToast)
+    except:
+        toast("Encountered error. Aborting.\nDevice might not exist yet.")
+        return
+
+
 def convertAndGetInfo(deviceID):
     try:
         with sqlite3.connect(db) as connection:
@@ -125,26 +139,7 @@ def getComputerInfo(deviceID):
     except:
         toast("Encountered error. Aborting.\nDevice might not exist yet.")
         return
-
-
-def getComputerModel(deviceID):
-    try:
-        with sqlite3.connect(db) as connection:
-            cursor = connection.cursor()
-            info = cursor.execute(f"SELECT Model FROM Computers WHERE Computername_Intune = '{deviceID}'")
-            info = info.fetchall()
-            pyperclip.copy(info[0][0])
-
-            toaster = WindowsToaster('MagicButton')
-            newToast = Toast()
-            newToast.duration
-            newToast.text_fields = ["Copied model name"]
-
-            toaster.show_toast(newToast)
-    except:
-        toast("Encountered error. Aborting.\nDevice might not exist yet.")
-        return
-
+    
 
 def formatSheetADRL():
     # Move to leftmost cell
