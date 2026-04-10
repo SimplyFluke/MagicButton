@@ -89,7 +89,7 @@ if macPattern.match(clip):
 if len(clip) != 12 and clip.isupper():
     options.append(("Make string lower caps", lambda: mb.capitalizeString(clip)))
 
-if "google sheets" in window.lower():
+if "google sheets" in window.lower() or "google regneark" in window.lower():
     options.append(("Format sheet (ADRL)", lambda: mb.formatSheetADRL()))
 
 
