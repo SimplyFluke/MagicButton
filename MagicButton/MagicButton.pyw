@@ -4,13 +4,13 @@ import pyperclip
 import tkinter as tk # New import in v2.0
 import MBfunctions as mb
 
-from time import sleep # For tests
+from time import sleep
 from win32gui import GetWindowText, GetForegroundWindow
 
-try: 
+try: # Create an empty Shortcuts.py with necessary dicts if missing
     from Shortcuts import shortcuts, toastShortcuts
 
-except ModuleNotFoundError: # Create Shortcuts.py with necessary dicts if file is missing
+except ModuleNotFoundError:
     with open ("Shortcuts.py", "w") as f:
         f.write("shortcuts = {}\ntoastShortcuts = {}")
 
@@ -71,6 +71,11 @@ if clip in shortcuts.keys(): # Run shortcuts outside of other functions? Smash t
         mb.toast("Copied shortcut.")
     exit()
 
+if "|" in clip:
+    textInput = clip.split("|")
+    url = textInput[0].strip()
+    name = textInput[1].strip()
+    mb.createSNHyperlink(url, name)
 
 if "tkp" in clip.lower() and len(clip) > 10:
     options.append(("Get printer info", lambda: mb.compilePrinterInfo(clip)))
@@ -91,8 +96,6 @@ if len(clip) != 12 and clip.isupper():
 
 if "google sheets" in window.lower() or "google regneark" in window.lower():
     options.append(("Format sheet (ADRL)", lambda: mb.formatSheetADRL()))
-
-
 
 if not options:
     mb.toast(f'Could not find function "{clip}"')
