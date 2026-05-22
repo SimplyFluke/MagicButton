@@ -56,7 +56,7 @@ def convertIDfromAD(deviceID):
     try:
         with sqlite3.connect(db) as connection:
             cursor = connection.cursor()
-            info = cursor.execute(f"SELECT Computername_Intune, IntuneDeviceID FROM Computers WHERE Computername_AD = '{deviceID}'")
+            info = cursor.execute(f"SELECT Computername_Intune, IntuneDeviceID FROM Computers WHERE Computername_AD = '{deviceID.upper()}'")
             info = info.fetchall()
             pyperclip.copy(info[0][0])
             
@@ -80,7 +80,7 @@ def getComputerModel(deviceID):
     try:
         with sqlite3.connect(db) as connection:
             cursor = connection.cursor()
-            info = cursor.execute(f"SELECT Model FROM Computers WHERE Computername_Intune = '{deviceID}'")
+            info = cursor.execute(f"SELECT Model FROM Computers WHERE Computername_Intune = '{deviceID.upper()}'")
             info = info.fetchall()
             pyperclip.copy(info[0][0])
 
@@ -99,11 +99,11 @@ def convertAndGetInfo(deviceID):
     try:
         with sqlite3.connect(db) as connection:
             cursor = connection.cursor()
-            info = cursor.execute(f"SELECT Computername_Intune, IntuneDeviceID FROM Computers WHERE Computername_AD = '{deviceID}'")
+            info = cursor.execute(f"SELECT Computername_Intune, IntuneDeviceID FROM Computers WHERE Computername_AD = '{deviceID.upper()}'")
             info = info.fetchall()
-            info = cursor.execute(f"SELECT Model, Enrollment_date, Department, Aktiv, IntuneDeviceID FROM Computers WHERE Computername_Intune = '{deviceID}'")
+            info = cursor.execute(f"SELECT Model, Enrollment_date, Department, Aktiv, IntuneDeviceID FROM Computers WHERE Computername_Intune = '{deviceID.upper()}'")
             info = info.fetchall()
-            pyperclip.copy (f"Løpenummer: {deviceID}\nEnhet: {info[0][2]}\nModell: {info[0][0]}\nInnrullert: {info[0][1]}\nAktiv: {info[0][3]}")
+            pyperclip.copy (f"Løpenummer: {deviceID.upper()}\nEnhet: {info[0][2]}\nModell: {info[0][0]}\nInnrullert: {info[0][1]}\nAktiv: {info[0][3]}")
 
             toaster = WindowsToaster('MagicButton')
             newToast = Toast()
@@ -121,9 +121,9 @@ def getComputerInfo(deviceID):
     try:
         with sqlite3.connect(db) as connection:
             cursor = connection.cursor()
-            info = cursor.execute(f"SELECT Model, Enrollment_date, Department, Aktiv, IntuneDeviceID FROM Computers WHERE Computername_Intune = '{deviceID}'")
+            info = cursor.execute(f"SELECT Model, Enrollment_date, Department, Aktiv, IntuneDeviceID FROM Computers WHERE Computername_Intune = '{deviceID.upper()}'")
             info = info.fetchall()
-            pyperclip.copy (f"Løpenummer: {deviceID}\nEnhet: {info[0][2]}\nModell: {info[0][0]}\nInnrullert: {info[0][1]}\nAktiv: {info[0][3]}")
+            pyperclip.copy (f"Løpenummer: {deviceID.upper()}\nEnhet: {info[0][2]}\nModell: {info[0][0]}\nInnrullert: {info[0][1]}\nAktiv: {info[0][3]}")
 
             print(f"{intune_url}/{info[0][4]}")
             # Custom toast for computer lookup
@@ -181,3 +181,8 @@ def formatSheetADRL():
 
     toast("Formatted sheet for ADRL")
     return
+
+def createSNHyperlink(url, name):
+    hyperlink = f'[code]<a href="{url}" target="_blank">{name}</a>[/code]'
+    pyperclip.copy(hyperlink)
+    toast("Created hyperlink for SN.")
