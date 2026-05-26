@@ -1,9 +1,5 @@
-import re, os, urllib.request, importlib, pyperclip
-import tkinter as tk # New import in v2.0
-import MBfunctions as mb
-
-from time import sleep
-from win32gui import GetWindowText, GetForegroundWindow
+import os
+import urllib.request
 
 def _pull_updates():
     import json
@@ -35,11 +31,12 @@ def _pull_updates():
 
 _update_message = _pull_updates()
 
-import re
-import importlib
-import pyperclip
+import re, importlib, pyperclip
 import tkinter as tk # New import in v2.0
 import MBfunctions as mb
+
+from time import sleep
+from win32gui import GetWindowText, GetForegroundWindow
 
 from time import sleep
 from win32gui import GetWindowText, GetForegroundWindow
@@ -106,7 +103,7 @@ if clip in shortcuts.keys(): # Run shortcuts outside of other functions? Smash t
     pyperclip.copy (shortcuts[clip])
     try:
         mb.toast(f"Copypasta - {toastShortcuts[clip]}")
-    
+
     except:
         mb.toast("Copied shortcut.")
     exit()
