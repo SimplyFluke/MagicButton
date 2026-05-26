@@ -42,9 +42,6 @@ import MBfunctions as mb
 from time import sleep
 from win32gui import GetWindowText, GetForegroundWindow
 
-from time import sleep
-from win32gui import GetWindowText, GetForegroundWindow
-
 if _update_message:
     mb.toast(_update_message)
 
