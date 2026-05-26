@@ -1,3 +1,36 @@
+import os
+import urllib.request
+
+def _pull_updates():
+    import json
+    base = "https://raw.githubusercontent.com/SimplyFluke/MagicButton/main/MagicButton/"
+    here = os.path.dirname(os.path.abspath(__file__))
+    updated = False
+
+    for name in ("MBfunctions.py", "MagicButton.pyw"):
+        try:
+            remote = urllib.request.urlopen(base + name, timeout=5).read()
+            local_path = os.path.join(here, name)
+            with open(local_path, "rb") as f:
+                if f.read() != remote:
+                    with open(local_path, "wb") as f:
+                        f.write(remote)
+                    updated = True
+        except Exception:
+            pass
+
+    if not updated:
+        return None
+
+    try:
+        data = urllib.request.urlopen(base + "changelog.json", timeout=5).read()
+        entry = json.loads(data)
+        return f"Updated to v{entry['version']}\n{entry['changes']}"
+    except Exception:
+        return "Magic Button was updated."
+
+_update_message = _pull_updates()
+
 import re
 import importlib
 import pyperclip
@@ -6,6 +39,9 @@ import MBfunctions as mb
 
 from time import sleep
 from win32gui import GetWindowText, GetForegroundWindow
+
+if _update_message:
+    mb.toast(_update_message)
 
 try: # Create an empty Shortcuts.py with necessary dicts if missing
     from Shortcuts import shortcuts, toastShortcuts
@@ -66,7 +102,7 @@ if clip in shortcuts.keys(): # Run shortcuts outside of other functions? Smash t
     pyperclip.copy (shortcuts[clip])
     try:
         mb.toast(f"Copypasta - {toastShortcuts[clip]}")
-    
+
     except:
         mb.toast("Copied shortcut.")
     exit()
