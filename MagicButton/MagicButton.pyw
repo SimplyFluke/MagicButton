@@ -32,7 +32,7 @@ def _pull_updates():
 _update_message = _pull_updates()
 
 import re, importlib, pyperclip
-import tkinter as tk # New import in v2.0
+import tkinter as tk
 import MBfunctions as mb
 
 from time import sleep
