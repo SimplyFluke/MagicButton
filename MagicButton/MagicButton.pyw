@@ -6,6 +6,7 @@ def _pull_updates():
     base = "https://raw.githubusercontent.com/SimplyFluke/MagicButton/main/MagicButton/"
     here = os.path.dirname(os.path.abspath(__file__))
     updated = False
+    error = None
 
     for name in ("MBfunctions.py", "MagicButton.pyw"):
         try:
@@ -16,8 +17,11 @@ def _pull_updates():
                     with open(local_path, "wb") as f:
                         f.write(remote)
                     updated = True
-        except Exception:
-            pass
+        except Exception as e:
+            error = f"Update failed ({name}): {e}"
+
+    if error and not updated:
+        return error
 
     if not updated:
         return None
@@ -35,6 +39,10 @@ import re, importlib, pyperclip
 import tkinter as tk
 import MBfunctions as mb
 
+from time import sleep
+from win32gui import GetWindowText, GetForegroundWindow
+
+from time import sleep
 from win32gui import GetWindowText, GetForegroundWindow
 
 if _update_message:
