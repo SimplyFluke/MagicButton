@@ -1,4 +1,4 @@
 {
-    "version": "3.0.0",
-    "changes": "- Added automatic updates"
+    "version": "3.0.1",
+    "changes": "- Added check for MBfunctions.py"
 }
