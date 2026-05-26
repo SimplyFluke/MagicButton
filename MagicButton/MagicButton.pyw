@@ -19,7 +19,7 @@ except ModuleNotFoundError:
     shortcuts = Shortcuts.shortcuts
     toastShortcuts = Shortcuts.toastShortcuts
 
-__version__ = "2.0.0"
+__version__ = "3.0.0"
 
 window = GetWindowText(GetForegroundWindow())
 options = []
