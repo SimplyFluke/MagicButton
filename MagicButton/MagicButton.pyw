@@ -12,11 +12,16 @@ def _pull_updates():
         try:
             remote = urllib.request.urlopen(base + name, timeout=5).read()
             local_path = os.path.join(here, name)
-            with open(local_path, "rb") as f:
-                if f.read() != remote:
-                    with open(local_path, "wb") as f:
-                        f.write(remote)
-                    updated = True
+            if not os.path.exists(local_path):
+                with open(local_path, "wb") as f:
+                    f.write(remote)
+                updated = True
+            else:
+                with open(local_path, "rb") as f:
+                    if f.read() != remote:
+                        with open(local_path, "wb") as f:
+                            f.write(remote)
+                        updated = True
         except Exception as e:
             error = f"Update failed ({name}): {e}"
 
