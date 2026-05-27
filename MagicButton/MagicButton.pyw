@@ -62,7 +62,7 @@ except ModuleNotFoundError:
     shortcuts = Shortcuts.shortcuts
     toastShortcuts = Shortcuts.toastShortcuts
 
-__version__ = "3.0.1"
+__version__ = "3.1.0"
 
 window = GetWindowText(GetForegroundWindow())
 options = []
@@ -130,6 +130,9 @@ if "tka" in clip.lower() and len(clip) == 10:
 if clip.lower().startswith("tk") and len(clip) < 15 and not clip.lower().startswith("tka"):
     options.append(("Get computer info", lambda: mb.getComputerInfo(clip)))
     options.append(("Get model name only", lambda: mb.getComputerModel(clip)))
+
+if re.match(r'^KB\d+$', clip, re.IGNORECASE) or ("service-now.com" in clip and "sysparm_article=" in clip.lower()):
+    options.append(("Get KB article title", lambda: mb.getKBTitle(clip)))
 
 if macPattern.match(clip):
     options.append(("Convert MAC", lambda: mb.convertMac(clip)))
