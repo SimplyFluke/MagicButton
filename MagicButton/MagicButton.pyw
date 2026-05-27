@@ -1,5 +1,27 @@
 import os
+import sys
+import subprocess
 import urllib.request
+
+def _bootstrap():
+    packages = {
+        "pyperclip":      "pyperclip",
+        "win32gui":       "pywin32",
+        "pyautogui":      "pyautogui",
+        "windows_toasts": "windows-toasts",
+    }
+    for import_name, pkg_name in packages.items():
+        try:
+            __import__(import_name)
+        except ImportError:
+            print(f"Installing {pkg_name}...")
+            try:
+                subprocess.check_call([sys.executable, "-m", "pip", "install", pkg_name, "--quiet"])
+            except subprocess.CalledProcessError:
+                print(f"Failed to install {pkg_name}. Try: pip install {pkg_name}")
+                sys.exit(1)
+
+_bootstrap()
 
 def _pull_updates():
     import json
