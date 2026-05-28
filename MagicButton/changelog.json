@@ -1,4 +1,4 @@
 {
-    "version": "3.1.0",
-    "changes": "- Added automatic hyperlink creation for KB\n(First run might take a little while)"
+    "version": "3.1.2",
+    "changes": "- Fixed alternative SN links."
 }
