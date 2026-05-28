@@ -84,7 +84,7 @@ except ModuleNotFoundError:
     shortcuts = Shortcuts.shortcuts
     toastShortcuts = Shortcuts.toastShortcuts
 
-__version__ = "3.1.1"
+__version__ = "3.1.2"
 
 window = GetWindowText(GetForegroundWindow())
 options = []
@@ -136,12 +136,6 @@ if clip in shortcuts.keys(): # Run shortcuts outside of other functions? Smash t
         mb.toast("Copied shortcut.")
     exit()
 
-if "|" in clip:
-    textInput = clip.split("|")
-    url = textInput[0].strip()
-    name = textInput[1].strip()
-    mb.createSNHyperlink(url, name)
-
 if "tkp" in clip.lower() and len(clip) > 10:
     options.append(("Get printer info", lambda: mb.compilePrinterInfo(clip)))
 
@@ -153,7 +147,7 @@ if clip.lower().startswith("tk") and len(clip) < 15 and not clip.lower().startsw
     options.append(("Get computer info", lambda: mb.getComputerInfo(clip)))
     options.append(("Get model name only", lambda: mb.getComputerModel(clip)))
 
-if re.match(r'^KB\d+$', clip, re.IGNORECASE) or ("service-now.com" in clip and "sysparm_article=" in clip.lower()):
+if re.match(r'^KB\d+$', clip, re.IGNORECASE) or ("service-now.com" in clip and ("sysparm_article=" in clip.lower() or "sys_kb_id=" in clip.lower())):
     options.append(("Get KB article title", lambda: mb.getKBTitle(clip)))
 
 if macPattern.match(clip):
