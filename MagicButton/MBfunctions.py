@@ -218,17 +218,29 @@ def getKBTitle(kb_input):
 
     if kb_input.startswith("http"):
         instance_match = re.match(r"https://([\w-]+)\.service-now\.com", kb_input)
-        kb_match = re.search(r"sysparm_article=(KB\d+)", kb_input, re.IGNORECASE)
-        if not instance_match or not kb_match:
+        if not instance_match:
             toast("Could not parse ServiceNow URL.")
             return
         base_url = f"https://{instance_match.group(1)}.service-now.com"
-        kb_number = kb_match.group(1).upper()
+
+        kb_match = re.search(r"sysparm_article=(KB\d+)", kb_input, re.IGNORECASE)
+        sys_kb_match = re.search(r"sys_kb_id=([a-f0-9]+)", kb_input, re.IGNORECASE)
+
+        if kb_match:
+            kb_number = kb_match.group(1).upper()
+        elif sys_kb_match:
+            kb_number = None
+        else:
+            toast("Could not find a KB identifier in the URL.")
+            return
     else:
         base_url = sn_base_url
         kb_number = kb_input.upper()
 
-    page_url = f"{base_url}/ap?id=kb_article_view&sysparm_article={kb_number}"
+    if kb_number:
+        page_url = f"{base_url}/ap?id=kb_article_view&sysparm_article={kb_number}"
+    else:
+        page_url = kb_input
 
     profile_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "edge_profile")
 
@@ -244,25 +256,41 @@ def getKBTitle(kb_input):
     def is_login_page(title):
         return not title or "pålogging" in title.lower() or "login" in title.lower()
 
+    def resolve_kb(driver):
+        WebDriverWait(driver, 15).until(lambda d: d.title not in ("", "ServiceNow"))
+        if is_login_page(driver.title):
+            return None, None, None
+        h1 = WebDriverWait(driver, 15).until(
+            EC.presence_of_element_located((By.TAG_NAME, "h1"))
+        )
+        title = h1.text.strip() or None
+
+        resolved_kb = kb_number
+        if not resolved_kb:
+            for src in (driver.current_url, driver.page_source):
+                m = re.search(r'\bKB\d+\b', src, re.IGNORECASE)
+                if m:
+                    resolved_kb = m.group(0).upper()
+                    break
+
+        if resolved_kb:
+            clean_url = f"{base_url}/ap?id=kb_article_view&sysparm_article={resolved_kb}"
+        else:
+            clean_url = page_url
+
+        return title, resolved_kb, clean_url
+
     driver = None
     try:
-        def get_article_title(driver, timeout=15):
-            WebDriverWait(driver, timeout).until(lambda d: d.title not in ("", "ServiceNow"))
-            if is_login_page(driver.title):
-                return None
-            h1 = WebDriverWait(driver, timeout).until(
-                EC.presence_of_element_located((By.TAG_NAME, "h1"))
-            )
-            return h1.text.strip() or None
-
         driver = make_driver(headless=True)
         driver.get(page_url)
-        title = get_article_title(driver)
+        title, resolved_kb, clean_url = resolve_kb(driver)
         driver.quit()
         driver = None
 
         if title:
-            createSNHyperlink(page_url, f"{kb_number} - {title}")
+            label = f"{resolved_kb} - {title}" if resolved_kb else title
+            createSNHyperlink(clean_url, label)
             return
 
         # Session expired — open visible window so user can log in
@@ -270,11 +298,12 @@ def getKBTitle(kb_input):
         driver = make_driver(headless=False)
         driver.get(page_url)
         WebDriverWait(driver, 120).until(lambda d: not is_login_page(d.title))
-        title = get_article_title(driver, timeout=30)
+        title, resolved_kb, clean_url = resolve_kb(driver)
         driver.quit()
         driver = None
         if title:
-            createSNHyperlink(page_url, f"{kb_number} - {title}")
+            label = f"{resolved_kb} - {title}" if resolved_kb else title
+            createSNHyperlink(clean_url, label)
         else:
             toast("Logged in but could not find article title.")
 
