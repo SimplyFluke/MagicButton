@@ -2,6 +2,7 @@ import os
 import sys
 import subprocess
 import urllib.request
+import webbrowser
 
 def _bootstrap():
     packages = {
@@ -93,7 +94,7 @@ except ModuleNotFoundError:
     shortcuts = Shortcuts.shortcuts
     toastShortcuts = Shortcuts.toastShortcuts
 
-__version__ = "3.1.3"
+__version__ = "3.1.4"
 
 window = GetWindowText(GetForegroundWindow())
 options = []
@@ -170,6 +171,11 @@ if "google sheets" in window.lower() or "google regneark" in window.lower():
 
 if clip.lower() == "shortcuts":
     mb.showShortcuts(shortcuts, toastShortcuts)
+    exit()
+
+if clip.lower() == "help":
+    webbrowser.open("https://docs.google.com/document/d/14rv8u1-lMZvch7fxQTySQ5Knj6ndoKpNErN6Z2zIyb8/edit?tab=t.0")
+    mb.toast("Opening help document...")
     exit()
 
 if not options:
