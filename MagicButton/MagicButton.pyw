@@ -28,7 +28,7 @@ def _pull_updates():
     base = "https://raw.githubusercontent.com/SimplyFluke/MagicButton/main/MagicButton/"
     here = os.path.dirname(os.path.abspath(__file__))
     updated = False
-    error = None
+    errors = []
 
     for name in ("MBfunctions.py", "MagicButton.pyw"):
         try:
@@ -45,10 +45,10 @@ def _pull_updates():
                             f.write(remote)
                         updated = True
         except Exception as e:
-            error = f"Update failed ({name}): {e}"
+            errors.append(f"Update failed ({name}): {e}")
 
-    if error and not updated:
-        return error
+    if errors and not updated:
+        return "\n".join(errors)
 
     if not updated:
         return None
@@ -64,10 +64,19 @@ _update_message = _pull_updates()
 
 import re, importlib, pyperclip
 import tkinter as tk
-import MBfunctions as mb
+from tkinter import messagebox
 
 from time import sleep
 from win32gui import GetWindowText, GetForegroundWindow
+
+try:
+    import MBfunctions as mb
+except Exception as e:
+    root = tk.Tk()
+    root.withdraw()
+    messagebox.showerror("MagicButton – Load Error", f"Failed to load MBfunctions:\n\n{e}")
+    root.destroy()
+    sys.exit(1)
 
 if _update_message:
     mb.toast(_update_message)
@@ -84,7 +93,7 @@ except ModuleNotFoundError:
     shortcuts = Shortcuts.shortcuts
     toastShortcuts = Shortcuts.toastShortcuts
 
-__version__ = "3.1.2"
+__version__ = "3.1.3"
 
 window = GetWindowText(GetForegroundWindow())
 options = []
@@ -158,6 +167,10 @@ if len(clip) != 12 and clip.isupper():
 
 if "google sheets" in window.lower() or "google regneark" in window.lower():
     options.append(("Format sheet (ADRL)", lambda: mb.formatSheetADRL()))
+
+if clip.lower() == "shortcuts":
+    mb.showShortcuts(shortcuts, toastShortcuts)
+    exit()
 
 if not options:
     mb.toast(f'Could not find function "{clip}"')
