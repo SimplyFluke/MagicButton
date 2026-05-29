@@ -198,6 +198,52 @@ def formatSheetADRL():
     toast("Formatted sheet for ADRL")
     return
 
+def showShortcuts(shortcuts, toastShortcuts):
+    import tkinter as tk
+    from tkinter import ttk
+
+    root = tk.Tk()
+    root.title("Magic Button Shortcuts")
+    root.minsize(700, 300)
+
+    frame = tk.Frame(root)
+    frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+
+    tree = ttk.Treeview(frame, columns=("trigger", "name", "copies"), show="headings")
+    tree.heading("trigger", text="Trigger")
+    tree.heading("name", text="Name")
+    tree.heading("copies", text="Copies")
+    tree.column("trigger", width=180, anchor="w")
+    tree.column("name", width=250, anchor="w")
+    tree.column("copies", width=420, anchor="w")
+
+    for key, value in shortcuts.items():
+        tree.insert("", tk.END, values=(key, toastShortcuts.get(key, ""), value))
+
+    scrollbar = ttk.Scrollbar(frame, orient=tk.VERTICAL, command=tree.yview)
+    tree.configure(yscrollcommand=scrollbar.set)
+    tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+    scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
+    detail = tk.Text(root, height=5, wrap=tk.WORD, state=tk.DISABLED, relief=tk.FLAT,
+                     bg=root.cget("bg"), padx=10, pady=6)
+    detail.pack(fill=tk.X, padx=10, pady=(0, 10))
+
+    def on_select(_):
+        selected = tree.focus()
+        if not selected:
+            return
+        copies = tree.item(selected, "values")[2]
+        detail.config(state=tk.NORMAL)
+        detail.delete("1.0", tk.END)
+        detail.insert(tk.END, copies)
+        detail.config(state=tk.DISABLED)
+
+    tree.bind("<<TreeviewSelect>>", on_select)
+
+    root.mainloop()
+
+
 def createSNHyperlink(url, name):
     hyperlink = f'[code]<a href="{url}" target="_blank">{name}</a>[/code]'
     pyperclip.copy(hyperlink)
