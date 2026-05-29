@@ -1,4 +1,4 @@
 {
-    "version": "3.1.2",
-    "changes": "- Fixed alternative SN links."
+    "version": "3.1.3",
+    "changes": "- Added command: shortcuts\nDisplay current shortcuts and triggers."
 }
