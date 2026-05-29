@@ -28,7 +28,7 @@ def _pull_updates():
     base = "https://raw.githubusercontent.com/SimplyFluke/MagicButton/main/MagicButton/"
     here = os.path.dirname(os.path.abspath(__file__))
     updated = False
-    error = None
+    errors = []
 
     for name in ("MBfunctions.py", "MagicButton.pyw"):
         try:
@@ -45,10 +45,10 @@ def _pull_updates():
                             f.write(remote)
                         updated = True
         except Exception as e:
-            error = f"Update failed ({name}): {e}"
+            errors.append(f"Update failed ({name}): {e}")
 
-    if error and not updated:
-        return error
+    if errors and not updated:
+        return "\n".join(errors)
 
     if not updated:
         return None
@@ -84,7 +84,7 @@ except ModuleNotFoundError:
     shortcuts = Shortcuts.shortcuts
     toastShortcuts = Shortcuts.toastShortcuts
 
-__version__ = "3.1.3"
+__version__ = "3.1.2"
 
 window = GetWindowText(GetForegroundWindow())
 options = []
