@@ -131,7 +131,10 @@ def convertAndGetInfo(deviceID):
     except:
         toast("Encountered error. Aborting.\nDevice might not exist yet.")
         return
-    
+
+def g8FreezeLink():
+    pyperclip.copy("https://www.intel.com/content/www/us/en/download/864990/intel-11th-14th-gen-processor-graphics-windows.html")
+    toast ("Copied G8 freeze link.")
 
 def getComputerInfo(deviceID):
     try:
