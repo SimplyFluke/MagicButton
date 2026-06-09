@@ -169,6 +169,9 @@ if len(clip) != 12 and clip.isupper():
 if "google sheets" in window.lower() or "google regneark" in window.lower():
     options.append(("Format sheet (ADRL)", lambda: mb.formatSheetADRL()))
 
+if "beyondtrust" in window.lower():
+    options.append(("G8 freeze link", lambda: mb.g8FreezeLink()))
+
 if clip.lower() == "shortcuts":
     mb.showShortcuts(shortcuts, toastShortcuts)
     exit()
