@@ -297,6 +297,17 @@ def sendSuggestion():
             except Exception:
                 toast("Could not send suggestion. Try again later.")
 
+            try:
+                req = urllib.request.Request(
+                    "https://ntfy.sh/MagicButtonSuggestion",
+                    data=f"From: {upn}\n\n{suggestion}".encode("utf-8"),
+                    headers={"Title": "New MagicButton suggestion"},
+                    method="POST",
+                )
+                urllib.request.urlopen(req, timeout=10)
+            except Exception:
+                pass
+
         threading.Thread(target=send, daemon=True).start()
 
     button_frame = tk.Frame(root)
