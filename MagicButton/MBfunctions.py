@@ -12,6 +12,12 @@ from windows_toasts import Toast, WindowsToaster
 db = r'C:\ProgramData\TK\Klientoversikt\Computers.SQLite'
 intune_url = r'https://intune.microsoft.com/?l=en.en-gb#view/Microsoft_Intune_Devices/DeviceSettingsMenuBlade/~/overview/mdmDeviceId'
 sn_base_url = "https://YOUR_INSTANCE.service-now.com"  # Set your ServiceNow instance URL
+suggestion_form_url = "https://docs.google.com/forms/d/e/1FAIpQLSfsKRbWDqmPEtfevU3Kg1pN022aad1AwUdgz4f8HBTc75snZQ/formResponse"
+suggestion_entry_ids = {
+    "datetime":   "entry.1800241095",  # Dato
+    "user":       "entry.653819425",   # Brukernavn
+    "suggestion": "entry.296667659",   # Forslag
+}
 
 def _ensure(package, import_name=None):
     try:
@@ -243,6 +249,61 @@ def showShortcuts(shortcuts, toastShortcuts):
         detail.config(state=tk.DISABLED)
 
     tree.bind("<<TreeviewSelect>>", on_select)
+    root.mainloop()
+
+
+def sendSuggestion():
+    import tkinter as tk
+    from tkinter import scrolledtext
+    import threading
+    import urllib.request
+    import urllib.parse
+    from datetime import datetime
+
+    root = tk.Tk()
+    root.title("Magic Button - Suggestion")
+    root.minsize(400, 250)
+
+    tk.Label(root, text="Got an idea for a new shortcut or improvement?\nWrite it below:").pack(padx=10, pady=10, anchor="w")
+
+    text = scrolledtext.ScrolledText(root, wrap=tk.WORD, height=8)
+    text.pack(fill=tk.BOTH, expand=True, padx=10, pady=(0, 10))
+    text.focus_set()
+
+    def submit():
+        suggestion = text.get("1.0", tk.END).strip()
+        root.destroy()
+        if not suggestion:
+            return
+
+        def send():
+            try:
+                upn = subprocess.check_output(
+                    ["whoami", "/upn"], text=True, stderr=subprocess.DEVNULL, timeout=5
+                ).strip()
+                if not upn or "@" not in upn:
+                    upn = os.environ.get("USERNAME", "unknown")
+            except Exception:
+                upn = os.environ.get("USERNAME", "unknown")
+
+            data = urllib.parse.urlencode({
+                suggestion_entry_ids["datetime"]: datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                suggestion_entry_ids["user"]: upn,
+                suggestion_entry_ids["suggestion"]: suggestion,
+            }).encode()
+            try:
+                urllib.request.urlopen(suggestion_form_url, data=data, timeout=10)
+                toast("Thanks! Your suggestion was sent.")
+            except Exception:
+                toast("Could not send suggestion. Try again later.")
+
+        threading.Thread(target=send, daemon=True).start()
+
+    button_frame = tk.Frame(root)
+    button_frame.pack(pady=(0, 10))
+    tk.Button(button_frame, text="Send", width=10, command=submit).pack(side=tk.LEFT, padx=5)
+    tk.Button(button_frame, text="Cancel", width=10, command=root.destroy).pack(side=tk.LEFT, padx=5)
+
     root.mainloop()
 
 
